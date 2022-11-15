@@ -1,0 +1,127 @@
+<div class="container">
+    <div>
+        <a (click)="setLang('sp')" style="color:lightskyblue">SPANISH</a> ||
+        <a (click)="setLang('en')" style="color:lightskyblue">ENGLISH</a>
+      </div>
+<div class="card mt-2" style="border: transparent;">
+    <div class="card-body" style="background: whitesmoke;border-radius: 7px;">
+        <form [formGroup]="blogformgroup" (ngSubmit)="blogsubmit()">
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="form-group">
+                        <label>{{ 'description' | language }} </label>
+                        <textarea  formControlName="description" class="form-control"></textarea>
+                    </div>       
+                </div>
+                <div class="col-md-7">
+                    <div class="form-group">
+                        <label class="form-label" for="blogfile">{{ 'choosefile' | language }}</label>
+                        <input type="file" (change)="onFileSelected($event)" #fileinput class="form-control" id="blogfile" accept="image/png, image/gif, image/jpeg" />
+                      
+                    </div>   
+                    <div class="col-md-12" style="text-align: right;">
+                        <button class="btn btn-info btn-block mt-2" [disabled]="blogformgroup.get('description')?.invalid &&  blogformgroup.get('filepath')?.invalid">{{ 'buttonupload' | language }}</button>
+                    </div>
+                   
+                </div>
+                
+            </div>
+            
+        
+        </form>
+    </div>
+</div>
+
+
+    <div class="row">
+        <div class="col-md-5 col-xs-12 col-md-push-7" style="max-height: 100vh;overflow: scroll;">
+            <div *ngIf="allblogs">
+                <h3 class="Featured">Featured Posts</h3>
+                <div *ngIf="!isFetching && allblogs?.length>0" class="ml-3">  
+                    <div class="card row card-featured mt-2" style="border: transparent;" *ngFor="let i of allblogs ;let c= index ">
+                        <div class="card-body row" style="background: whitesmoke;border-radius: 7px;margin-left: 2px;">
+                            <div class="col-md-12 col-xs-12 pt-2" *ngIf="i.filepath">
+                                <img class="card-img-top" src="{{i.filepath}}" alt="Card image cap">
+                            </div>
+                            <div class="col-md-12 col-xs-12 mt-2">
+                                
+                                    <h6 class="card-title">{{i.description}}</h6>                                    
+                                    
+                            </div>
+                            <div class="col-md-12 col-xs-12 pb-2" style="text-align:right;cursor: pointer;">
+                                <a  (click)="loadBlog(c)">View ></a>
+                            </div>
+                        </div> 
+                    </div>
+                </div>
+
+                <div class="text-left no-result">
+                    <h4 *ngIf="featuredPost.length === 0">No Results Found</h4>
+                </div>
+
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-12 col-xs-12 col-md-pull-5">            
+            <div *ngIf="selectedblog" class="card mt-5" style="border: transparent;">
+                <div class="card-body" style="background: whitesmoke;border-radius: 7px;margin-left: 2px;">
+                    <div class="col-md-12 col-xs-12 pt-2" *ngIf="selectedblog.filepath" style="text-align: center;">
+                        <img class="card-img-top" src="{{selectedblog.filepath}}" alt="Card image cap">
+                    </div>
+                    <div class="col-md-12 col-xs-12 pt-2">
+                        <h6 class="card-title">{{selectedblog.description}}</h6>  
+                    </div>
+                    <div class="col-md-12 col-xs-12 pt-2">
+                        <i  *ngIf="!selectedblog?.isLike" class="fa fa-thumbs-o-up" style="font-size:15px" (click)="likeCount()"> {{selectedblog?.likecount ?? 0}} likes</i>
+                        <i  *ngIf="selectedblog?.isLike" class="fa fa-thumbs-up" style="font-size:15px" (click)="likeCount()"> {{selectedblog?.likecount ?? 0}} likes</i>
+                    </div>
+                    <div class="row mt-2">                        
+                            <app-blogcomment  [currentindex]="currentindex" [selectedcomments]="(selectedblog?.comments)??[]" [selectedblog]="selectedblog"> </app-blogcomment>
+                            
+                            <!-- <i  *ngIf="!item?.isLike" class="fa fa-thumbs-o-up" style="font-size:10px" (click)="likecommentCount()"> {{selectedblog?.likecount ?? 0}} likes</i> -->
+                            <!-- <i  *ngIf="item?.isLike" class="fa fa-thumbs-up" style="font-size:10px" (click)="likecommentCount()"> {{selectedblog?.likecount ?? 0}} likes</i> -->
+                       
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <input type="text"  class="form-control" [(ngModel)]="blogcomment" placeholder="Add comment" style="border: transparent;"/>                            
+                        </div>
+                        <div class="col-md-12 mt-1" style="text-align: right;">
+                            <button type="button" (click)="postcomment()" style="background-color: transparent;border: transparent;color: rgb(136, 136, 233);" class="">Post</button>
+                        </div>
+                        
+                       
+                    </div>
+                </div>
+               
+            </div>
+
+
+
+        </div>
+
+
+
+
+
+        <!-- <ng-template #loading>
+        <div *ngIf="isFetching && !error" class="loading-text">
+            <div class="loader"></div>
+            <p> loading Contet...</p>
+        </div>
+        <div *ngIf="error && !isFetching" class="error-text">
+            <h4>{{error}}</h4>
+        </div>
+    </ng-template>
+    <div class="col-sm-4 col-xs-12">
+    </div> -->
+
+        <div *ngIf="isFetching && !error" class="loading-text">
+            <!-- <app-loading-spinner></app-loading-spinner> -->
+        </div>
+
+        <div *ngIf="error && !isFetching" class="error-text">
+            <h4>{{error}}</h4>
+
+        </div>
+    </div>
+</div>
